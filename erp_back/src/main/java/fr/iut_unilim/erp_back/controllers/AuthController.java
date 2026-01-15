@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.configuration.JwtUtils;
 import fr.iut_unilim.erp_back.dto.AuthResponse;
 import fr.iut_unilim.erp_back.dto.EditUserRequest;
@@ -121,10 +122,19 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/user-info")
-    public ResponseEntity<?> getUserInfo(@RequestBody String identifier) {
+    @GetMapping("/user-info/{identifier}")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    public ResponseEntity<?> getUserInfo(@PathVariable String identifier) {
+        ErpBackApplication.LOGGER.info("Getting user info for id: " + identifier);
         Connection user = connectionRepository.findByIdentifier(identifier);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         Teacher teacher = teacherService.getTeacherInfoByUser(user.getId());
+        if (teacher == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         return ResponseEntity.ok(Map.of("firstname", teacher.getFirstname(), "lastname", teacher.getLastname()));
     }
