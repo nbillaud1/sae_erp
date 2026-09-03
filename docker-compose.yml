@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:latest
+    image: mariadb:11.4
     container_name: erp_db
     restart: always
     environment:
@@ -9,7 +9,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
 
 volumes:
-  mysql_data:
+  mariadb_data:
